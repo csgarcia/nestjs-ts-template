@@ -1,0 +1,12 @@
+services:
+  service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /app/node_modules
+      - .:/app
+    env_file:
+      - ./.envs/.env.example
+    ports:
+      - '3000:3000'
