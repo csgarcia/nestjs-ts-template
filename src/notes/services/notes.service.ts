@@ -4,7 +4,9 @@ import { Injectable } from '@nestjs/common';
 export class NotesService {
   constructor() {}
 
-  getHello(): string {
-    return 'Hello World!';
+  async create(): Promise<any> {}
+
+  async getAll(): Promise<any[]> {
+    return [];
   }
 }

@@ -4,6 +4,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptors
 import { VersioningType } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { swaggerConfig } from './swagger.config';
+import { GeneralResponseDto } from './common/decorators/response-docs.decorator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,7 @@ async function bootstrap() {
   // Api Docs
   const document = SwaggerModule.createDocument(app, swaggerConfig, {
     ignoreGlobalPrefix: true,
+    extraModels: [GeneralResponseDto],
   });
   SwaggerModule.setup('docs', app, document);
 
