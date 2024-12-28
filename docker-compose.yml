@@ -6,7 +6,21 @@ services:
     volumes:
       - /app/node_modules
       - .:/app
+    depends_on:
+      - db
     env_file:
       - ./.envs/.env.example
     ports:
       - '3000:3000'
+
+  db:
+    image: postgis/postgis:14-3.2-alpine
+    ports:
+      - '15432:5432'
+    env_file:
+      - ./.envs/.db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data: {}
