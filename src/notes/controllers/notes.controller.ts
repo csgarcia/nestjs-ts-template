@@ -1,24 +1,62 @@
-import { Controller, Get, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { NotesService } from '../services/notes.service';
 import { DocApiResponse } from '../../common/decorators/response-docs.decorator';
 import { NotesResponseDto } from '../dto/notes.response.dto';
 import { ApiExtraModels } from '@nestjs/swagger';
+import { CreateNoteDto, UpdateNoteDto } from '../dto/notes.dto';
+import { Note } from '../entities/note.entity';
 
 @Controller({ path: 'notes', version: '1' })
-@ApiExtraModels(NotesResponseDto)
+@ApiExtraModels(NotesResponseDto, Note)
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
   @Post('/')
-  @DocApiResponse(HttpStatus.CREATED, 'Ok', 0, NotesResponseDto)
-  @DocApiResponse(HttpStatus.BAD_REQUEST, 'Error in Create DTO', 1000)
-  async create() {
-    return this.notesService.create();
+  @DocApiResponse(HttpStatus.CREATED, 'Ok', 0, Note)
+  @DocApiResponse(HttpStatus.BAD_REQUEST, 'Error in Create DTO', 0)
+  async create(@Body() createNoteDto: CreateNoteDto): Promise<Note> {
+    return this.notesService.create(createNoteDto);
   }
 
   @Get('/')
-  @DocApiResponse(HttpStatus.OK, 'Ok', 0, NotesResponseDto, 'array')
-  async getAll() {
+  @DocApiResponse(HttpStatus.OK, 'Ok', 0, Note, 'array')
+  async getAll(): Promise<Note[]> {
     return this.notesService.getAll();
+  }
+
+  @Get('/:note_id')
+  @DocApiResponse(HttpStatus.OK, 'Ok', 0, Note)
+  @DocApiResponse(HttpStatus.NOT_FOUND, 'Note not found', 1000)
+  async getOne(@Param('note_id', ParseUUIDPipe) noteId: string): Promise<Note> {
+    return this.notesService.getOne(noteId);
+  }
+
+  @Put('/:note_id')
+  @DocApiResponse(HttpStatus.OK, 'Updated', 0, Note)
+  @DocApiResponse(HttpStatus.NOT_FOUND, 'Note not found for update', 1000)
+  @DocApiResponse(HttpStatus.BAD_REQUEST, 'Error in Update DTO', 0)
+  async update(
+    @Param('note_id', ParseUUIDPipe) noteId: string,
+    @Body() updateNoteDto: UpdateNoteDto,
+  ): Promise<Note> {
+    return this.notesService.update(noteId, updateNoteDto);
+  }
+
+  @Delete('/:note_id')
+  @DocApiResponse(HttpStatus.OK, 'Deleted', 0)
+  async deletel(
+    @Param('note_id', ParseUUIDPipe) noteId: string,
+  ): Promise<void> {
+    return this.notesService.delete(noteId);
   }
 }

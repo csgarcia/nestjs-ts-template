@@ -14,14 +14,18 @@ export class Note {
   id: string;
 
   @Column()
+  @ApiProperty()
   title: string;
 
   @Column()
+  @ApiProperty()
   description: string;
 
   @CreateDateColumn()
+  @ApiProperty()
   created_at: Date;
 
   @UpdateDateColumn()
+  @ApiProperty()
   updated_at: Date;
 }

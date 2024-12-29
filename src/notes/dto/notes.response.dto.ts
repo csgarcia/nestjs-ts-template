@@ -1,8 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Note } from '../entities/note.entity';
 
-export class NotesResponseDto {
-  @ApiProperty()
-  id: string;
-  @ApiProperty()
-  description: string;
-}
+export class NotesResponseDto extends Note {}
