@@ -3,6 +3,7 @@ NodeJs TS Template for free use. This uses:
 - [Nest](https://github.com/nestjs/nest) framework TypeScript
 - Postgresql Database with Typeorm
 - Docker Container usage
+- OpenAPI and Swagger API Docs
 
 ## Requirements
 - NodeJs Version >= 22.0.0
