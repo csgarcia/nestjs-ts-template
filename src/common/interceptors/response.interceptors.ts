@@ -5,6 +5,7 @@ import {
   CallHandler,
   BadRequestException,
   HttpException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
@@ -25,7 +26,6 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
         return { code: 0, message: 'ok', data };
       }),
       catchError((e) => {
-        console.log(e);
         let response = null;
         if (e instanceof HttpException || e instanceof BadRequestException) {
           response = e.getResponse();
@@ -39,6 +39,18 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
                 message: Array.isArray(response.message)
                   ? response.message.join(', ')
                   : response.message,
+                data: {},
+              }),
+          );
+        }
+
+        // Map another internal error with just messages
+        if (!response && e.message) {
+          return throwError(
+            () =>
+              new InternalServerErrorException({
+                code: 0,
+                message: e.message,
                 data: {},
               }),
           );

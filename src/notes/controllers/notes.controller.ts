@@ -24,6 +24,7 @@ export class NotesController {
   @Post('/')
   @DocApiResponse(HttpStatus.CREATED, 'Ok', 0, Note)
   @DocApiResponse(HttpStatus.BAD_REQUEST, 'Error in Create DTO', 0)
+  @DocApiResponse(HttpStatus.INTERNAL_SERVER_ERROR, 'Error in Database', 0)
   async create(@Body() createNoteDto: CreateNoteDto): Promise<Note> {
     return this.notesService.create(createNoteDto);
   }
