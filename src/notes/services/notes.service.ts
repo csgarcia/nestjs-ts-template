@@ -1,18 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Note } from '../entities/note.entity';
 import { Repository } from 'typeorm';
 import { constants } from '../constants/notes.constants';
 import { CustomException } from '../../common/exceptions/custom.exception';
 import { CreateNoteDto, UpdateNoteDto } from '../dto/notes.dto';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
-const { RESPONSES } = constants;
+const { RESPONSES, NOTES_CACHE_KEY, NOTES_CACHE_DURATION_MS } = constants;
 
 @Injectable()
 export class NotesService {
+  private readonly logger = new Logger(NotesService.name);
   constructor(
     @InjectRepository(Note)
     private noteRepository: Repository<Note>,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {}
 
   async create(createNoteDto: CreateNoteDto): Promise<Note> {
@@ -48,5 +52,25 @@ export class NotesService {
 
   async getAll(): Promise<Note[]> {
     return this.noteRepository.find();
+  }
+
+  /**
+   * This version implements NestJs cache manager
+   * @returns
+   */
+  async getAllV2(): Promise<Note[]> {
+    const cachedNotes: Note[] = await this.cacheManager.get(NOTES_CACHE_KEY);
+    if (!cachedNotes) {
+      this.logger.debug('Cache was not found, create new one');
+      const notes = await this.getAll();
+      await this.cacheManager.set(
+        NOTES_CACHE_KEY,
+        notes,
+        NOTES_CACHE_DURATION_MS,
+      );
+      return notes;
+    }
+    this.logger.debug('Cache was found, return cached notes');
+    return cachedNotes;
   }
 }

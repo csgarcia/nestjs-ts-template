@@ -7,7 +7,9 @@ import { swaggerConfig } from './swagger.config';
 import { GeneralResponseDto } from './common/decorators/response-docs.decorator';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'error', 'debug'],
+  });
 
   // To use validation pipes
   app.useGlobalPipes(
